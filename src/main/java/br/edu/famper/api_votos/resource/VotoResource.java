@@ -1,5 +1,6 @@
 package br.edu.famper.api_votos.resource;
 
+import br.edu.famper.api_votos.service.VotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
