@@ -24,7 +24,6 @@ public class Cargo {
     @Column(name = "descricao", length = 250)
     private String descricao;
 
-    @OneToMany(mappedBy = "cargo", targetEntity = Candidato.class, fetch = FetchType.LAZY)
-    @JoinColumn
+    @OneToMany(mappedBy = "cargo", fetch = FetchType.LAZY)
     private Set<Candidato> candidatos;
 }

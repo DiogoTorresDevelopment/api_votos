@@ -1,10 +1,7 @@
 package br.edu.famper.api_votos.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Set;
 
 @Entity
 @Table(name = "candidato")
@@ -23,10 +20,9 @@ public class Candidato {
     private String nome;
 
     @Column(name = "partido", length = 100)
-    private String partido; // Corrigido o nome do atributo
+    private String partido;
 
     @ManyToOne
     @JoinColumn(name = "cargo_id")
     private Cargo cargo;
-
 }
