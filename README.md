@@ -1,125 +1,146 @@
-API Votos
+
+# API Votos
+
 API para gerenciar eleições, eleitores, candidatos, cargos e votos.
 
-Sumário
-Pré-requisitos
-Instalação
-Configuração do Banco de Dados
-Execução
-Ordem de Requisições
-Testes no Postman
-Documentação
-Pré-requisitos
-Java 17 ou superior
-Maven (para gerenciamento de dependências)
-PostgreSQL (banco de dados)
-Instalação
-Clonar o repositório:
+## Sumário
 
-bash
-Copiar código
-git clone <URL_DO_REPOSITORIO_GIT>
-cd api_votos
-Instalar dependências:
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação](#instalação)
+- [Configuração do Banco de Dados](#configuração-do-banco-de-dados)
+- [Execução](#execução)
+- [Ordem de Requisições](#ordem-de-requisições)
+- [Testes no Postman](#testes-no-postman)
+- [Documentação](#documentação)
 
-bash
-Copiar código
-mvn clean install
-Configuração do Banco de Dados
-Inicie o PostgreSQL e crie o banco de dados:
+---
 
-sql
-Copiar código
-CREATE DATABASE api_votos;
-(Opcional) Crie um usuário específico para o projeto:
+## Pré-requisitos
 
-sql
-Copiar código
-CREATE USER api_votos_user WITH PASSWORD 'sua_senha';
-ALTER DATABASE api_votos OWNER TO api_votos_user;
-Configure as credenciais no arquivo src/main/resources/application.properties:
+- **Java 17** ou superior
+- **Maven** (para gerenciamento de dependências)
+- **PostgreSQL** (banco de dados)
 
-properties
-Copiar código
-spring.datasource.url=jdbc:postgresql://localhost:5432/api_votos
-spring.datasource.username=api_votos_user
-spring.datasource.password=sua_senha
-Execução
+## Instalação
+
+1. **Clonar o repositório**:
+   ```bash
+   git clone <URL_DO_REPOSITORIO_GIT>
+   cd api_votos
+   ```
+
+2. **Instalar dependências**:
+   ```bash
+   mvn clean install
+   ```
+
+## Configuração do Banco de Dados
+
+1. Inicie o PostgreSQL e crie o banco de dados:
+   ```sql
+   CREATE DATABASE api_votos;
+   ```
+
+2. (Opcional) Crie um usuário específico para o projeto:
+   ```sql
+   CREATE USER api_votos_user WITH PASSWORD 'sua_senha';
+   ALTER DATABASE api_votos OWNER TO api_votos_user;
+   ```
+
+3. Configure as credenciais no arquivo `src/main/resources/application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5432/api_votos
+   spring.datasource.username=api_votos_user
+   spring.datasource.password=sua_senha
+   ```
+
+## Execução
+
 Para rodar o projeto, execute o seguinte comando no terminal:
 
-bash
-Copiar código
+```bash
 mvn spring-boot:run
-A aplicação estará disponível em: http://localhost:8080.
+```
 
-Ordem de Requisições
+A aplicação estará disponível em: `http://localhost:8080`.
+
+---
+
+## Ordem de Requisições
+
 Para evitar erros de relacionamento ao usar a API, siga esta ordem para as requisições POST:
 
-Cargo:
+1. **Cargo**:
+   - Crie os cargos primeiro, pois os candidatos irão referenciar um cargo.
+   ```json
+   {
+     "nome": "Presidente",
+     "descricao": "Cargo de presidente da república"
+   }
+   ```
 
-Crie os cargos primeiro, pois os candidatos irão referenciar um cargo.
-json
-Copiar código
-{
-  "nome": "Presidente",
-  "descricao": "Cargo de presidente da república"
-}
-Candidato:
+2. **Candidato**:
+   - Crie os candidatos após os cargos, associando cada candidato a um cargo.
+   ```json
+   {
+     "nome": "João da Silva",
+     "partido": "Partido X",
+     "cargo": { "id": 1 }
+   }
+   ```
 
-Crie os candidatos após os cargos, associando cada candidato a um cargo.
-json
-Copiar código
-{
-  "nome": "João da Silva",
-  "partido": "Partido X",
-  "cargo": { "id": 1 }
-}
-Eleição:
+3. **Eleição**:
+   - Crie as eleições e associe os candidatos a elas.
+   ```json
+   {
+     "titulo": "Eleições Municipais 2024",
+     "descricao": "Eleições para prefeitos",
+     "dataInicio": "2024-01-01",
+     "dataFim": "2024-01-30",
+     "candidatos": [ { "id": 1 } ]
+   }
+   ```
 
-Crie as eleições e associe os candidatos a elas.
-json
-Copiar código
-{
-  "titulo": "Eleições Municipais 2024",
-  "descricao": "Eleições para prefeitos",
-  "dataInicio": "2024-01-01",
-  "dataFim": "2024-01-30",
-  "candidatos": [ { "id": 1 } ]
-}
-Eleitor:
+4. **Eleitor**:
+   - Crie eleitores, pois eles irão votar em candidatos nas eleições.
+   ```json
+   {
+     "nome": "Carlos Almeida",
+     "cpf": "12345678901",
+     "email": "carlos.almeida@example.com"
+   }
+   ```
 
-Crie eleitores, pois eles irão votar em candidatos nas eleições.
-json
-Copiar código
-{
-  "nome": "Carlos Almeida",
-  "cpf": "12345678901",
-  "email": "carlos.almeida@example.com"
-}
-Voto:
+5. **Voto**:
+   - Registre os votos após os eleitores, candidatos e eleições estarem criados.
+   ```json
+   {
+     "eleitor": { "id": 1 },
+     "candidato": { "id": 1 },
+     "eleicao": { "id": 1 }
+   }
+   ```
 
-Registre os votos após os eleitores, candidatos e eleições estarem criados.
-json
-Copiar código
-{
-  "eleitor": { "id": 1 },
-  "candidato": { "id": 1 },
-  "eleicao": { "id": 1 }
-}
-Testes no Postman
-Importe a documentação da API no Postman usando a URL do OpenAPI (Swagger):
+---
 
-bash
-Copiar código
-http://localhost:8080/api-docs.json
-Configure a variável {{base_url}} como http://localhost:8080 para facilitar o uso dos endpoints.
+## Testes no Postman
 
-Execute as requisições seguindo a ordem definida acima para evitar erros de relacionamento.
+1. Importe a documentação da API no Postman usando a URL do OpenAPI (Swagger):
+   ```
+   http://localhost:8080/api-docs.json
+   ```
 
-Documentação
+2. Configure a variável `{{base_url}}` como `http://localhost:8080` para facilitar o uso dos endpoints.
+
+3. Execute as requisições seguindo a ordem definida acima para evitar erros de relacionamento.
+
+---
+
+## Documentação
+
 A documentação completa da API é gerada automaticamente pelo Swagger e pode ser acessada em:
-
-bash
-Copiar código
+```
 http://localhost:8080/docs
-Este README.md fornece todas as informações essenciais para instalar, configurar e utilizar a API api_votos, com um guia para as requisições e uma introdução sobre como realizar testes no Postman.
+```
+
+---
